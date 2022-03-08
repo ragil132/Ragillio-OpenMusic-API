@@ -3,6 +3,9 @@ const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const path = require('path');
 const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
+const HapiSwagger = require('hapi-swagger');
+const Pack = require('../package.json');
 const ClientError = require('./exceptions/ClientError');
 const songs = require('./api/songs');
 const SongsService = require('./services/postgres/SongsService');
@@ -47,6 +50,13 @@ const init = async () => {
     },
   });
 
+  const swaggerOptions = {
+    info: {
+      title: Pack.name,
+      version: Pack.version,
+    },
+  };
+
   await server.register([
     {
       plugin: Jwt,
@@ -54,6 +64,13 @@ const init = async () => {
     {
       plugin: Inert,
     },
+    {
+      plugin: Vision,
+    },
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions
+    }
   ]);
 
   server.auth.strategy('songsapp_jwt', 'jwt', {
